@@ -5,3 +5,5 @@ public enum CELL_TYPE
     MINE,
     NUMBER
 }
+
+public delegate void OnBoardUpdate();

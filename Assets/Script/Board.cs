@@ -7,7 +7,9 @@ public class Board : MonoBehaviour
 {
     public Tile unknownTile;
     public Tile flagTile;
+    public Tile WrongFlagged;
     public Tile mineTile;
+    public Tile ExplodedTile;
     public Tile emptyTile;
 
     public Tile[] numberTile;
@@ -56,7 +58,14 @@ public class Board : MonoBehaviour
             case CELL_TYPE.EMPTY:
                 return emptyTile;
             case CELL_TYPE.MINE:
-                return mineTile;
+                if (cell.isExploded)
+                {
+                    return ExplodedTile;
+                }
+                else
+                {
+                    return mineTile;
+                }
             case CELL_TYPE.NUMBER:
                 return numberTile[cell.number-1];
             default:

@@ -593,7 +593,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unknownTile: {fileID: 11400000, guid: 303b59d58ec3b9a4f9511dfff7989b97, type: 2}
   flagTile: {fileID: 11400000, guid: 5578031361871144f9b8cf816319536e, type: 2}
-  mineTile: {fileID: 11400000, guid: f58f138e99141c94ea4eb04cc89819f1, type: 2}
+  WrongFlagged: {fileID: 0}
+  mineTile: {fileID: 11400000, guid: bd9b9a4d305d15748b1c7f489a08da9c, type: 2}
+  ExplodedTile: {fileID: 11400000, guid: f58f138e99141c94ea4eb04cc89819f1, type: 2}
   emptyTile: {fileID: 11400000, guid: 03a9b781bfed28a4087dbd50702f3314, type: 2}
   numberTile:
   - {fileID: 11400000, guid: e0301ce284c1d59408d73ea6a67d664f, type: 2}

@@ -12,11 +12,11 @@ public class CellGrid
 
     public Cell this[int x,int y] => cells[x,y];
 
-
+    public List<Cell> bombCells = new List<Cell>();
+    public List<Cell> FlaggedCells = new List<Cell>();
     public CellGrid(int _width, int _height)
     {
         cells = new Cell[_width, _height];
-
         for (int x = 0; x < Width; x++)
         {
             for (int y = 0; y < Height; y++)
@@ -32,6 +32,7 @@ public class CellGrid
 
     public void PlaceMines(Cell startingCell, int numberOfMines)
     {
+        bombCells.Clear();
         for (int i = 0; i < numberOfMines; i++)
         {
             int x = Random.Range(0, Width);
@@ -41,6 +42,7 @@ public class CellGrid
             if (cell.type != CELL_TYPE.MINE && !IsAdjacent(cell,startingCell))
             {
                 cells[x, y].type = CELL_TYPE.MINE;
+                bombCells.Add(cells[x, y]);
             }
             else
             {
@@ -120,10 +122,10 @@ public class CellGrid
 
     public void RevealCell(Vector3Int gridPos)
     {
-        Cell cell = (Cell)GetCellAtPosition(gridPos);
-        if (InBounds(gridPos) && !cell.isFlagged && !cell.isRevealed)
+        Cell? cell = GetCellAtPosition(gridPos);
+        if (cell!=null && InBounds(gridPos) && !cell.Value.isFlagged && !cell.Value.isRevealed)
         {
-            if (cell.type == CELL_TYPE.EMPTY)
+            if (cell.Value.type == CELL_TYPE.EMPTY)
             {
                 FloodEmptyCell(gridPos);
             }
@@ -133,6 +135,10 @@ public class CellGrid
             }
         }
 
+        if (cell.Value.type == CELL_TYPE.MINE)
+        {
+            cells[gridPos.x, gridPos.y].isExploded = true;
+        }
     }
 
     public void FlagCell(Vector3Int gridPos)
@@ -141,6 +147,18 @@ public class CellGrid
         if (InBounds(gridPos) && cell != null && !cell.Value.isRevealed)
         {
             cells[gridPos.x, gridPos.y].isFlagged = !cells[gridPos.x, gridPos.y].isFlagged;
+            if (cells[gridPos.x, gridPos.y].isFlagged)
+            {
+                FlaggedCells.Add(cells[gridPos.x, gridPos.y]);
+            }
+            else
+            {
+                Cell _cell = cells[gridPos.x, gridPos.y];
+                if (FlaggedCells.Contains(_cell))
+                {
+                    FlaggedCells.Remove(_cell);
+                }
+            }
         }
     }
 
@@ -192,4 +210,6 @@ public class CellGrid
 
         return neighbors;
     }
+
+    public void RevealMineCell(int x, int y) => cells[x, y].isRevealed = true;
 }
