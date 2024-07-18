@@ -94,28 +94,31 @@ public class CellGrid
         return mineCount;
     }
 
-    private void FloodEmptyCell(Vector3Int gridPos)
+    private void FloodEmptyCell(Cell? _cell)
     {
-        Queue<Cell> cellsToCheck = new Queue<Cell>();
-        Cell? startCell = GetCellAtPosition(gridPos);
-        cellsToCheck.Enqueue((Cell)startCell);
-        while (cellsToCheck.Count > 0)
+        if (_cell == null) return;
+        if (!InBounds(_cell.Value.cellPosition)) return;
+        if (_cell.Value.isRevealed) return; ;
+        if (_cell.Value.isFlagged || _cell.Value.type == CELL_TYPE.MINE) return;
+
+        cells[_cell.Value.cellPosition.x, _cell.Value.cellPosition.y].isRevealed = true;
+        if(_cell.Value.type == CELL_TYPE.EMPTY)
         {
-            Cell cell = cellsToCheck.Dequeue();
-            if (!cell.isRevealed && !cell.isFlagged)
+            if (TryGetCell(new Vector3Int(_cell.Value.cellPosition.x + 1, _cell.Value.cellPosition.y),out Cell? left))
             {
-                cells[cell.cellPosition.x, cell.cellPosition.y].isRevealed = true;
-                if (cell.number == 0)
-                {
-                    List<Cell> celList = GetNeighbors(cell);
-                    foreach (Cell _cell in celList)
-                    {
-                        if (!_cell.isRevealed && !cell.isFlagged)
-                        {
-                            cellsToCheck.Enqueue(_cell);
-                        }
-                    }
-                }
+                FloodEmptyCell(left);
+            }
+            if (TryGetCell(new Vector3Int(_cell.Value.cellPosition.x - 1, _cell.Value.cellPosition.y), out Cell? right))
+            {
+                FloodEmptyCell(right);
+            }
+            if (TryGetCell(new Vector3Int(_cell.Value.cellPosition.x, _cell.Value.cellPosition.y+1), out Cell? Up))
+            {
+                FloodEmptyCell(Up);
+            }
+            if (TryGetCell(new Vector3Int(_cell.Value.cellPosition.x + 1, _cell.Value.cellPosition.y-1), out Cell? Down))
+            {
+                FloodEmptyCell(Down);
             }
         }
     }
@@ -127,7 +130,7 @@ public class CellGrid
         {
             if (cell.Value.type == CELL_TYPE.EMPTY)
             {
-                FloodEmptyCell(gridPos);
+                FloodEmptyCell((Cell)cell);
             }
             else
             {
@@ -188,28 +191,33 @@ public class CellGrid
         }
     }
 
-    List<Cell> GetNeighbors(Cell Cell)
+    public bool TryGetCell(Vector3Int pos ,out Cell? cell)
     {
-        List<Cell> neighbors = new List<Cell>();
-
-        for (int dx = -1; dx <= 1; dx++)
+        Cell? cell1 = GetCellAtPosition(pos);
+        if (cell1 != null)
         {
-            for (int dy = -1; dy <= 1; dy++)
-            {
-                if (dx == 0 && dy == 0) continue;
-
-                Vector3Int neighborPos = new Vector3Int(Cell.cellPosition.x + dx, Cell.cellPosition.y + dy, Cell.cellPosition.z);
-                Cell? neigborcell = GetCellAtPosition(neighborPos);
-                if (neigborcell != null)
-                {
-                    neighbors.Add((Cell)neigborcell);
-                }
-
-            }
+            cell = cell1;
+        }
+        else
+        {
+            cell = null;
         }
 
-        return neighbors;
+        
+        return cell != null;
     }
 
+
     public void RevealMineCell(int x, int y) => cells[x, y].isRevealed = true;
+
+    public void RevealWrongFlaggedCells()
+    {
+        foreach(Cell cell in FlaggedCells)
+        {
+            if(cell.type != CELL_TYPE.MINE)
+            {
+                cells[cell.cellPosition.x, cell.cellPosition.y].type = CELL_TYPE.INCORRECT_GUESS;
+            }
+        }
+    }
 }

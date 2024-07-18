@@ -3,7 +3,8 @@ public enum CELL_TYPE
 {
     EMPTY,
     MINE,
-    NUMBER
+    NUMBER,
+    INCORRECT_GUESS,
 }
 
 public delegate void OnBoardUpdate();

@@ -7,7 +7,7 @@ public class Board : MonoBehaviour
 {
     public Tile unknownTile;
     public Tile flagTile;
-    public Tile WrongFlagged;
+    public Tile WrongFlaggedTile;
     public Tile mineTile;
     public Tile ExplodedTile;
     public Tile emptyTile;
@@ -43,6 +43,7 @@ public class Board : MonoBehaviour
             return GetRevealedTile(cell);
         }else if (cell.isFlagged)
         {
+            if (cell.type == CELL_TYPE.INCORRECT_GUESS) return WrongFlaggedTile;
             return flagTile;
         }
         else

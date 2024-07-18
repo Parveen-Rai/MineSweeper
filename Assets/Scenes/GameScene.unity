@@ -304,6 +304,7 @@ GameObject:
   - component: {fileID: 519420032}
   - component: {fileID: 519420031}
   - component: {fileID: 519420029}
+  - component: {fileID: 519420033}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -385,6 +386,27 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &519420033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 958a32f69f612c046ba56374fc37cbd2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  panSpeed: 20
+  panLimit: {x: 8, y: 8, z: -10}
+  scrollSpeed: 100
+  minZoom: 5
+  maxZoom: 50
+  maxX: 8
+  minX: 8
+  maxY: 8
+  minY: 8
 --- !u!1 &682800955
 GameObject:
   m_ObjectHideFlags: 0
@@ -419,6 +441,7 @@ MonoBehaviour:
   height: 9
   numberOfMines: 10
   longPressDuration: 0.5
+  CameraController: {fileID: 519420033}
 --- !u!4 &682800957
 Transform:
   m_ObjectHideFlags: 0
@@ -593,7 +616,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   unknownTile: {fileID: 11400000, guid: 303b59d58ec3b9a4f9511dfff7989b97, type: 2}
   flagTile: {fileID: 11400000, guid: 5578031361871144f9b8cf816319536e, type: 2}
-  WrongFlagged: {fileID: 0}
+  WrongFlaggedTile: {fileID: 11400000, guid: 4ae3c9a4b68d47247b56a3d430c4d6ca, type: 2}
   mineTile: {fileID: 11400000, guid: bd9b9a4d305d15748b1c7f489a08da9c, type: 2}
   ExplodedTile: {fileID: 11400000, guid: f58f138e99141c94ea4eb04cc89819f1, type: 2}
   emptyTile: {fileID: 11400000, guid: 03a9b781bfed28a4087dbd50702f3314, type: 2}

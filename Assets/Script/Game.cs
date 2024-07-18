@@ -14,13 +14,14 @@ public class Game : MonoBehaviour
     private CellGrid grid;
     private bool isGenerated = false;
     private bool isGameOver = false;
-    public OnBoardUpdate boardUpdate;
+    private Vector3 touchStart = Vector3.zero;
+
+    public CameraController CameraController;
     void Start()
     {
-        Camera.main.transform.position = new Vector3(width / 2f, height / 2f, -10f);
+       CameraController.init(width,height);
         grid = new CellGrid(width, height);
         board.Draw(grid);
-        boardUpdate = () => board.Draw(grid);
     }
 
     void Update()
@@ -68,14 +69,24 @@ public class Game : MonoBehaviour
     private void MouseControls()
     {
         Vector3 pos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        Vector3Int gridPos = board.tilemap.WorldToCell(pos);
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
         {
-            Reveal(gridPos);
+            touchStart = Input.mousePosition;
         }
-        else if (Input.GetMouseButtonDown(1))
+        Vector3Int gridPos = board.tilemap.WorldToCell(pos);
+        if(Input.mousePosition == touchStart)
         {
-            Flag(gridPos);
+            if (Input.GetMouseButtonUp(0))
+            {
+                Reveal(gridPos);
+                touchStart = Vector3.zero;
+            }
+            else if (Input.GetMouseButtonUp(1))
+            {
+                Flag(gridPos);
+                touchStart = Vector3.zero;
+            }
+           
         }
     }
 
@@ -119,6 +130,7 @@ public class Game : MonoBehaviour
         {
             isGameOver = true;
             isGenerated = false;
+            grid.RevealWrongFlaggedCells();
             StartCoroutine(RevealMines());
         }
       
@@ -129,7 +141,8 @@ public class Game : MonoBehaviour
         for (int i = 0; i < grid.bombCells.Count; i++)
         {
             yield return new WaitForSeconds(0.2f);
-            if (!grid.bombCells[i].isExploded || !grid.bombCells[i].isFlagged)
+            Cell cell = grid[grid.bombCells[i].cellPosition.x, grid.bombCells[i].cellPosition.y];
+            if (!cell.isExploded && !cell.isFlagged)
             {
                 grid.RevealMineCell(grid.bombCells[i].cellPosition.x, grid.bombCells[i].cellPosition.y);
                 board.Draw(grid);
