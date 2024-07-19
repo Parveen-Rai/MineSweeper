@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -20,12 +21,19 @@ public class CameraController : MonoBehaviour
     public float maxY;
     public float minY;
 
-    public void init(int width,int height)
+    private Vector2 boardSize;
+    private Vector2 minCameraClamp;
+    private Vector2 maxCameraClamp;
+
+
+    public void init(int boardWidth, int boardHeight)
     {
-        startPos = new Vector3(width / 2f, height / 2f, -10f);
-        maxZoom = width;
+        startPos = new Vector3(boardWidth / 2f, boardHeight / 2f, -10f);
+        maxZoom = boardWidth;
+        boardSize = new Vector2(boardWidth, boardHeight);
         Camera.main.orthographicSize = maxZoom;
         transform.position = startPos;
+        CalCameraMovementClamp();
     }
 
     void Update()
@@ -44,8 +52,11 @@ public class CameraController : MonoBehaviour
         if (Input.GetMouseButton(0))
         {
             Vector3 direction = touchStart - Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            transform.position += direction;
-            
+            var cameraNewPos = transform.position + direction;
+            cameraNewPos.x = Mathf.Clamp(cameraNewPos.x, minCameraClamp.x, maxCameraClamp.x);
+            cameraNewPos.y = Mathf.Clamp(cameraNewPos.y, minCameraClamp.y, maxCameraClamp.y);
+            transform.position = cameraNewPos;
+
         }
 
         if (Input.touchCount == 1)
@@ -58,8 +69,10 @@ public class CameraController : MonoBehaviour
             if (Input.GetTouch(0).phase == TouchPhase.Moved)
             {
                 Vector3 direction = touchStart - Camera.main.ScreenToWorldPoint(Input.GetTouch(0).position);
-
-                Camera.main.transform.position += direction;
+                var cameraNewPos = Camera.main.transform.position + direction;
+                cameraNewPos.x = Mathf.Clamp(cameraNewPos.x, minCameraClamp.x, maxCameraClamp.x);
+                cameraNewPos.y = Mathf.Clamp(cameraNewPos.y, minCameraClamp.y, maxCameraClamp.y);
+                Camera.main.transform.position = cameraNewPos;
             }
         }
         //Vector3 pos = transform.position;
@@ -86,9 +99,24 @@ public class CameraController : MonoBehaviour
             Camera.main.orthographicSize -= difference * scrollSpeed * Time.deltaTime;
             Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize, minZoom, maxZoom);
         }
+        else
+        {
+            float scroll = Input.GetAxis("Mouse ScrollWheel");
+            Camera.main.orthographicSize -= scroll * scrollSpeed * Time.deltaTime;
+            Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize, minZoom, maxZoom);
+        }
+        CalCameraMovementClamp();
+    }
 
-        float scroll = Input.GetAxis("Mouse ScrollWheel");
-        Camera.main.orthographicSize -= scroll * scrollSpeed * Time.deltaTime;
-        Camera.main.orthographicSize = Mathf.Clamp(Camera.main.orthographicSize, minZoom, maxZoom);
+    private void CalCameraMovementClamp()
+    {
+        var minClampX = (boardSize.x / 2) - (maxZoom - Camera.main.orthographicSize) / 2;
+        var maxClampX = (boardSize.x / 2) + (maxZoom - Camera.main.orthographicSize) / 2;
+
+        var clampY1 = (maxZoom - Camera.main.orthographicSize);
+        var clampY2 = boardSize.y - (maxZoom - Camera.main.orthographicSize);
+
+        minCameraClamp = new Vector2(minClampX, clampY1 < clampY2 ? clampY1 :clampY2);
+        maxCameraClamp = new Vector2(maxClampX, clampY1 > clampY2 ? clampY1 :clampY2);
     }
 }
